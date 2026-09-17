@@ -1,0 +1,149 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "dns": {
+    "queryStrategy": "UseIPv4",
+    "servers": [
+      "https+local://dns.google/dns-query",
+      "8.8.8.8",
+      "8.8.4.4"
+    ]
+  },
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+            "email": "normal@cazar"
+          },
+          {
+            "id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+            "email": "ai@cazar"
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+          {
+            "path": "/xhttp",
+            "dest": 10001
+          },
+          {
+            "dest": 10002
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "sockopt": {
+          "tcpFastOpen": true,
+          "tcpKeepAliveInterval": 15
+        }
+      }
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 10001,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+            "email": "normal@cazar"
+          },
+          {
+            "id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+            "email": "ai@cazar"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": {
+          "path": "/xhttp"
+        },
+        "sockopt": {
+          "tcpKeepAliveInterval": 15
+        }
+      }
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 10002,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+            "email": "normal@cazar"
+          },
+          {
+            "id": "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+            "email": "ai@cazar"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "/"
+        },
+        "sockopt": {
+          "tcpKeepAliveInterval": 15
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct-normal",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tcpFastOpen": true,
+          "tcpKeepAliveInterval": 15
+        }
+      }
+    },
+    {
+      "tag": "direct-ai",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tcpFastOpen": true,
+          "tcpKeepAliveInterval": 15
+        }
+      }
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "user": [
+          "ai@cazar"
+        ],
+        "outboundTag": "direct-ai"
+      },
+      {
+        "type": "field",
+        "user": [
+          "normal@cazar"
+        ],
+        "outboundTag": "direct-normal"
+      }
+    ]
+  }
+}
